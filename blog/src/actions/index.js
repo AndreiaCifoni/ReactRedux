@@ -1,10 +1,20 @@
 import _ from "lodash";
 import jsonPlaceholder from "../apis/jsonPlaceholder";
 
-export const fetchPostsAndUsers = () => async (dispatch) => {
-  console.log("About to fetch posts");
+export const fetchPostsAndUsers = () => async (dispatch, getState) => {
   await dispatch(fetchPosts());
-  console.log("fetched posts!");
+
+  //esse 'chain' vai passando os valores pro proximo... o valor de chain passa pra map,
+  //e o resultado de map passa pra uniq e assim vai... terminamos o chain com o 'value'
+  //essa era a função antes::
+  // const userIds = _.uniq(_.map(getState().posts, "userId"));
+  // userIds.forEach((id) => dispatch(fetchUser(id)));
+
+  _.chain(getState().posts)
+    .map("userId")
+    .uniq()
+    .forEach((id) => dispatch(fetchUser(id)))
+    .value();
 };
 
 export const fetchPosts = () => async (dispatch) => {
